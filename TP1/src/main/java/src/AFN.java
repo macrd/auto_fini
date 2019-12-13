@@ -93,7 +93,7 @@ public class AFN<S> {
 
         States<S> listStatesRead = new States<>();
         States<S> statesRead = this.transitionRelation.successors(this.setOfInitialStates,
-                                                                  this.alphabet.iterator().next());
+                this.alphabet.iterator().next());
         listStatesRead.addAllStates(this.setOfInitialStates);
         return emptyLanguage(listStatesRead,statesRead);
 
@@ -140,4 +140,89 @@ public class AFN<S> {
             }
         }
     }
+
+
+    private boolean notSuccessorsVue(States<S> courantStates, States<S> allStatesVue){
+        courantStates = new States<>();
+        for (Letter letter:
+                this.alphabet) {
+            courantStates.addAllStates(this.transitionRelation.successors(courantStates,letter));
+        }
+
+        if (contain(allStatesVue.iterator(),courantStates)){
+            return false;
+        }
+        allStatesVue.addAllStates(courantStates);
+        return true;
+
+    }
+
+    private boolean reachable(S state, States<S> courantStates, States<S> allStatesVue){
+        if (contain(state,courantStates)){
+            return true;
+        }
+
+        if (notSuccessorsVue(courantStates,allStatesVue)) {
+            return reachable(state,courantStates, allStatesVue);
+        }
+        return false;
+    }
+
+    public States<S> reachable(){
+
+        States<S> res = new States<>();
+
+        for (Iterator<S> it = this.setOfStates.iterator(); it.hasNext(); ) {
+            S state = it.next();
+            States<S> allStatesVue = new States<>();
+            if (reachable(state,this.setOfInitialStates,allStatesVue)){
+                res.addState(state);
+            }
+        }
+        return res;
+    }
+
+
+    private boolean coreachable(States<S> courantStates, States<S> allStatesVue){
+        for (S state: courantStates.getSetOfStates()) {
+            if (contain(state,this.setOfFinalStates)){
+                return true;
+            }
+        }
+        if (notSuccessorsVue(courantStates,allStatesVue)) {
+            return coreachable(courantStates, allStatesVue);
+        }
+        return false;
+    }
+
+    public States<S> coreachable(){
+
+        States<S> res = new States<>();
+
+        for (Iterator<S> it = this.setOfStates.iterator(); it.hasNext(); ) {
+            S state = it.next();
+            States<S> allStatesVue = new States<>();
+            States<S> courantState = new States<>();
+            for (Letter letter: this.alphabet) {
+                courantState.addAllStates(this.transitionRelation.successor(state,letter));
+            }
+            if (coreachable(courantState,allStatesVue)){
+                res.addState(state);
+            }
+        }
+        return res;
+    }
+
+    public void trim(){
+        States<S> accessible = reachable();
+        States<S> coaccessible = coreachable();
+        for (S state:
+                accessible.getSetOfStates()) {
+            if (contain(state,coaccessible)){
+
+            }
+
+        }
+    }
+
 }
