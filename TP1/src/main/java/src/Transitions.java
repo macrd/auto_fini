@@ -15,7 +15,7 @@ public class Transitions<S>
      */
     public Transitions()
     {
-      this.SetofTransitions = new HashSet<Transition<S>>();  
+      this.SetofTransitions = new HashSet<>();
     }
     
     /**

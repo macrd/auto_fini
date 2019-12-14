@@ -216,13 +216,20 @@ public class AFN<S> {
     public void trim(){
         States<S> accessible = reachable();
         States<S> coaccessible = coreachable();
-        for (S state:
-                accessible.getSetOfStates()) {
-            if (contain(state,coaccessible)){
+        this.setOfStates.getSetOfStates().removeIf
+                (state -> !(contain(state, coaccessible) && contain(state, accessible)));
+    }
 
-            }
-
+    public AFN<S> mirror(){
+        Transitions<S> mirrorTransitions = new Transitions<>();
+        for (Transition<S> currentTransition : this.transitionRelation.getSetofTransitions()){
+            mirrorTransitions.addTransition(
+                    new Transition<>(
+                            currentTransition.getTarget(),
+                            currentTransition.getLabel(),
+                            currentTransition.getSource()));
         }
+        return new AFN<>(this.alphabet,this.setOfStates,this.setOfFinalStates,this.setOfInitialStates,mirrorTransitions);
     }
 
 }
